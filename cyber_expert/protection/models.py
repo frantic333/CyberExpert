@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from .function import tool_file_size
 
 
 class Article(models.Model):
@@ -35,7 +36,7 @@ class Rubric(models.Model):
 
 class Instruments(models.Model):
     file_name = models.CharField(verbose_name='Название файла', max_length=30, unique=True)
-    instrument = models.ImageField(verbose_name='Инструмент', blank=False, upload_to='instruments')
+    instrument = models.FileField(verbose_name='Инструмент', blank=False, validators=[tool_file_size], upload_to='instruments')
     description = models.TextField(verbose_name='Возможности и характеристики', max_length=200)
     is_confirmed = models.BooleanField(verbose_name='Безопасность подтверждена')
     user_sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Пользователь отправитель')
@@ -52,7 +53,7 @@ class Instruments(models.Model):
 
 class Comments(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='статья')
-    parent_comment = models.TextField(verbose_name='Родительский комментарий', max_length=150)
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Родительский комментарий', null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Автор комментария')
     date_sent = models.DateField(verbose_name='Дата отправки комментария')
 
