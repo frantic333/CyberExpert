@@ -4,11 +4,11 @@ from .function import tool_file_size
 
 
 class Article(models.Model):
-    title = models.CharField(verbose_name='Описание статьи', max_length=30, unique=True)
+    title = models.CharField(verbose_name='Описание статьи', max_length=70, unique=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Автор курса')
     rubric = models.ManyToManyField('Rubric', db_table='article_rubric', related_name='rubric', verbose_name='рубрика')
     date_added = models.DateField(verbose_name='Дата добавления')
-    content = models.TextField(verbose_name='Контент статьи', max_length=1500)
+    content = models.TextField(verbose_name='Контент статьи', max_length=10000)
     image = models.ImageField(verbose_name='Картинка', blank=True, upload_to='images')
 
     class Meta:
@@ -65,7 +65,7 @@ class Comments(models.Model):
 
 class Rating(models.Model):
     estimator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Кто оценил пользователя')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Кому поставлена оценка')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ratings', verbose_name='Кому поставлена оценка')
     rating = models.PositiveIntegerField(verbose_name='Оценка')
 
     class Meta:
