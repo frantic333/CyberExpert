@@ -27,7 +27,7 @@ class Rubric(models.Model):
     class Meta:
         verbose_name_plural = 'Рубрики'
         verbose_name = 'Рубрика'
-        ordering = ['rubric']
+        ordering = ['name']
 
 
     def __str__(self):
@@ -37,7 +37,7 @@ class Rubric(models.Model):
 class Instruments(models.Model):
     file_name = models.CharField(verbose_name='Название файла', max_length=30, unique=True)
     instrument = models.FileField(verbose_name='Инструмент', blank=False, validators=[tool_file_size], upload_to='instruments')
-    description = models.TextField(verbose_name='Возможности и характеристики', max_length=200)
+    description = models.TextField(verbose_name='Возможности и характеристики', max_length=1000)
     is_confirmed = models.BooleanField(verbose_name='Безопасность подтверждена')
     user_sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Пользователь отправитель')
 
