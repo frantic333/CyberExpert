@@ -10,5 +10,5 @@ urlpatterns = [
     path('rubric/', rubric, name='rubric'),
     path('instrument/', instrument, name='instrument'),
     path('comment/<int:article_id>', comment, name='comment'),
-    path('rating/<int:user_id>', rating, name='rating')
+    path('rating/<int:user_id>/<int:article_id>', rating, name='rating')
 ]

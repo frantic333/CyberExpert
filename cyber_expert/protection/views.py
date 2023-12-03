@@ -58,12 +58,12 @@ def comment(request, article_id):
         return render(request, 'detail')
 
 
-def rating(request, user_id):
+def rating(request, user_id, article_id):
     author = User.objects.get(id=user_id)
     if request.method == 'POST':
         data = request.POST
         Rating.objects.create(estimator=request.user, author=author,
                               rating=data['rating'])
-        return reverse('detail')
+        return redirect(reverse('detail', kwargs={'artcile_id': article_id}))
     else:
         return render(request, 'rating.html')
