@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="courses_container">
+        {% for instrument in instruments %}
+            <div class="course_preview">
+                <p>{{ instrument.file_name }}</p>
+                <p>{{ instrument.description }}</p>
+                <p>Пользователь-отправитель: {{ instrument.user_sender.last_name }}  {{ instrument.user_sender.first_name }}</p>
+                <p>{{ instrument.instrument }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

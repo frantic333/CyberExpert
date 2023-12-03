@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 from .views import *
 
 
@@ -6,8 +6,9 @@ urlpatterns = [
     path('', index, name='index'),
     path('create/', create, name='create'),
     path('delete/<int:article_id>', delete, name='delete'),
-    re_path('^detail/(?P<article_id>[1-9][0-9])/$', detail, name='detail'),
+    path('detail/<int:article_id>', detail, name='detail'),
     path('rubric/', rubric, name='rubric'),
+    path('instrument/', instrument, name='instrument'),
     path('comment/<int:article_id>', comment, name='comment'),
-    path('rating/<int:article_id>', rating, name='rating')
+    path('rating/<int:user_id>', rating, name='rating')
 ]
