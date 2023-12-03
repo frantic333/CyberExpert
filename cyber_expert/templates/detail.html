@@ -4,14 +4,10 @@
         <div class="course_preview" style="transform: none, box-shadow: none, border: none">
             <p><a style="color:red" href="{% url 'delete' article.pk %}">Удалить</a></p>
             <p>{{ article.title }}</p>
-            <div>
-                    <p>Автор: {{article.author.last_name }} {{ article.author.first_name }}</p>
-                    <form id="form" method="post" action="{% url 'rating' article.author.pk article.pk %}">
-                    {% csrf_token %}
-                    <p><input type="number" name="rating" min="1" max="5" step="1"></p>
-                    <button type="submit">Оценить</button>
-                    </form>
-            </div>
+            <p>
+                Автор: {{article.author.last_name }} {{ article.author.first_name }}
+                <a href="{% url 'rating' article.author.pk article.pk %}">оценить</a>
+            </p>
             <p>{{ article.image }}</p>
             <p>{{ article.content }}</p>
         </div>
