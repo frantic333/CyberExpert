@@ -16,19 +16,22 @@
             <p>{{ article.image }}</p>
             <p>{{ article.content }}</p>
         </div>
-        <div class="course_preview" style="margin-top: 1%; transform: none; box-shadow: none; border: none">
-            <p style="font-weight: bold">Комментарии</p>
+
+        <p style="font-weight: bold; margin-left: 5.5%">
+            Комментарии
+            <span style="font-weight: initial; font-size: .85em">{{ comments.count }}</span>
+            <a style="font-size: .8em" href="{% url 'comment' article.pk %}">Написать комментарий</a>
+        </p>
+
+        <div class="reviews_container">
             {% for comment in comments %}
+            <div class="review">
                 <p>{{ comment.author.last_name }} {{ comment.author.first_name }} {{ comment.date_sent }}</p>
                 <p>{{ comment.parent_comment }}</p>
+            </div>
+            {% empty %}
+            <p><a href="{% url 'comment' article.pk %}">Оставьте комментарий.</a> Комментариев пока нет </p>
             {% endfor %}
-            <form method="post" action="{% url 'comment' article.pk %}">
-                {% csrf_token %}
-                <p>
-                    <textarea placeholder="оставить комментарий" name="parent_comment" style="width: 70%; height: 200px" maxlength="100" required></textarea>
-                    <button type="submit" style="width: 270px; height: 120px">отправить</button>
-                </p>
-            </form>
         </div>
     </div>
 {% endblock %}

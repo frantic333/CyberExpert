@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from protection.models import Article, Rating
+from django.db.models import Avg
 
 
 class User(AbstractUser):
@@ -18,3 +20,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'Участник {self.first_name} {self.last_name}: {self.email}'
+
+    def get_average_rating(self):
+        rating = Rating.objects.filter(author=self).aggregate(ave_rating=Avg('rating'))
+        return rating.get('ave_rating')
