@@ -6,17 +6,7 @@
             <form id="form" method="post">
                 <h3>{% block form_name %}Создание статьи {% endblock %}</h3>
                 {% csrf_token %}
-                <p><input type="text" maxlength="70" placeholder="Описание статьи" name="title"></p>
-                <p><textarea placeholder="Текст статьи" name="content" maxlength="10000" required></textarea></p>
-                <p><input type="date" placeholder="Дата добавления" name="date_added" required></p>
-                <p><input type="file" placeholder="Картинка" name="image"></p>
-                <p>
-                    <select>
-                        {% for rubric in rubrics %}
-                            <option>{{ rubric }}</option>
-                        {% endfor %}
-                    </select>
-                </p>
+                {{ form.as_p  }}
                 <p><button type="submit">Создать</button></p>
             </form>
         </div>

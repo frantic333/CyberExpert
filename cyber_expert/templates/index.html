@@ -7,6 +7,7 @@
                 <p><a href="{% url 'detail' article.pk %}">{{ article.title }}</a></p>
                 <p>{{ article.date_added }}</p>
                 <p>Автор: {{ article.author.last_name }}  {{ article.author.first_name }}</p>
+                <p>рэйтинг {{ users.ave }}</p>
             </div>
         {% endfor %}
     </div>

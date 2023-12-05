@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block aside %}
+    <div class="courses_container">
+        {% for rubric, count in rubric_article %}
+            <div class="course_preview">
+                <p>-{{ rubric }} {{ count }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

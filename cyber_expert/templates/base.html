@@ -15,13 +15,9 @@
           <a class="logo" href="{% url 'index' %}">
             <img src="{% static 'logo.png' %}" alt="Лого сайта" title="Лого сайта">
           </a>
-            <div class="describer">
-                <div class="title"><h2 translate="no">CyberExpert</h2></div>
-                <div class="role">Кибербезопасность</div>
-            </div>
             <div class="sections">
-                <div class="article_title"><a href="{% url 'index' %}"></a></div>
-                <div class="instrument_title"><a href="{% url 'instrument' %}"></a></div>
+                <div class="article_title"><a href="{% url 'index' %}">Статьи</a></div>
+                <div class="instrument_title"><a href="{% url 'instrument' %}">Инструменты</a></div>
             </div>
         </div>
           <div class="nav-toggle"><span></span></div>
@@ -35,7 +31,7 @@
                         </div>
                     </div>
                 </div>
-                <div><a href="{% url 'create' %}">Создать курс</a></div>
+                <div><a href="{% url 'create' %}">Опубликовать статью </a></div>
             {% else %}
                 <div class="nav-toggle"><span></span></div>
                 <div class="login"><a href="{% url 'login' %}" style="color: #000">Вход</a></div>
@@ -44,6 +40,9 @@
         </div>
       </nav>
     </header>
+    <aside>
+        {% block aside %}{% endblock %}
+    </aside>
     <main>
         {% block content %}{% endblock %}
     </main>

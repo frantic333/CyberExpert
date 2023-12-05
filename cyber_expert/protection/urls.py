@@ -3,12 +3,13 @@ from .views import *
 
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('create/', create, name='create'),
-    path('delete/<int:article_id>', delete, name='delete'),
-    path('detail/<int:article_id>', detail, name='detail'),
+    path('', MainView.as_view(), name='index'),
+    path('create/', ArticleCreateView.as_view(), name='create'),
+    path('update/<int:article_id>', ArticleUpdateView.as_view(), name='update'),
+    path('delete/<int:article_id>', ArticleDeleteView.as_view(), name='delete'),
+    path('detail/<int:article_id>', ArticleDetailView.as_view(), name='detail'),
     path('rubric/', rubric, name='rubric'),
     path('instrument/', instrument, name='instrument'),
     path('comment/<int:article_id>', comment, name='comment'),
-    path('rating/<int:user_id>/<int:article_id>', rating, name='rating')
+    path('rating/<int:author_id>/<int:article_id>', rating, name='rating')
 ]

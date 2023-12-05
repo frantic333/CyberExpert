@@ -52,24 +52,30 @@ img {
     align-items: center;
     justify-content: center;
 }
-.describer {
+.sections {
     display: flex;
-    flex-direction: column;
+    line-height: 24.2em;
+    flex-direction: row;
     justify-content: center;
 }
-.describer .title, .footer_container .title {
+.footer_container .title {
     font-family: "Mochiy Pop P One", Helvetica, Arial, sans-serif;
     font-size: .8em;
     letter-spacing: .05em;
     opacity: 70%;
 }
-.role {
-    font-family: "Nunito", Helvetica, Arial, sans-serif;
-    font-style: italic;
-    font-size: .55em;
-    line-height: 1.2em;
-    letter-spacing: .25em;
-    opacity: 55%;
+.sections .article_title {
+    font-family: "Mochiy Pop P One", Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    letter-spacing: .05em;
+    opacity: 70%;
+}
+.sections .instrument_title {
+    font-family: "Mochiy Pop P One", Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    margin-left: 3%;
+    letter-spacing: .05em;
+    opacity: 70%;
 }
 .auth_container {
     display: flex;
