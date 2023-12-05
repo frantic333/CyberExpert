@@ -141,9 +141,15 @@ def rubric(request):
     rubrics = Rubric.objects.all()
     rubric_article = {}
     for rubric in rubrics:
-        rubric_article.update({rubric.name: Article.objects.filter(rubric=rubric.id).count()})
+        rubric_article.update({rubric: Article.objects.filter(rubric=rubric.id).count()})
     return render(request, context={'rubric_article': rubric_article},
-                  template_name='rubric.html')
+                  template_name='base.html')
+
+
+def rubric_article(request, rubric_id):
+    articles = Article.objects.filter(rubric=rubric_id)
+    return render(request, context={'articles': articles},
+                  template_name='rubric_article.html')
 
 
 @login_required

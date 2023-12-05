@@ -41,7 +41,14 @@
       </nav>
     </header>
     <aside>
-        {% block aside %}{% endblock %}
+        <div class="article_title">
+            <a href="{% url 'rubric' %}">Рубрики</a>
+            {% for rubric, count in rubric_article.items %}
+            <ul>
+                <li><a href="{% url 'rubric_article' rubric.pk %}">- {{ rubric.name }} {{ count }}</a></li>
+            </ul>
+            {% endfor %}
+        </div>
     </aside>
     <main>
         {% block content %}{% endblock %}

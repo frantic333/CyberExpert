@@ -9,6 +9,7 @@ urlpatterns = [
     path('delete/<int:article_id>', ArticleDeleteView.as_view(), name='delete'),
     path('detail/<int:article_id>', ArticleDetailView.as_view(), name='detail'),
     path('rubric/', rubric, name='rubric'),
+    path('rubric_article/<int:rubric_id>', rubric_article, name='rubric_article'),
     path('instrument/', instrument, name='instrument'),
     path('comment/<int:article_id>', comment, name='comment'),
     path('rating/<int:author_id>/<int:article_id>', rating, name='rating')

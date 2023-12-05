@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="courses_container">
+        {% for article in articles %}
+            <div class="course_preview">
+                <p><a href="{% url 'detail' article.pk %}">{{ article.title }}</a></p>
+                <p>{{ article.date_added }}</p>
+                <p>Автор: {{ article.author.last_name }}  {{ article.author.first_name }}</p>
+                <p>рэйтинг {{ article.author.get_average_rating }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
