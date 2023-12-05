@@ -43,9 +43,9 @@
     <aside>
         <div class="article_title">
             <a href="{% url 'rubric' %}">Рубрики</a>
-            {% for rubric, count in rubric_article.items %}
+            {% for rubric in rubrics %}
             <ul>
-                <li><a href="{% url 'rubric_article' rubric.pk %}">- {{ rubric.name }} {{ count }}</a></li>
+                <li><a href="{% url 'rubric_article' rubric.pk %}">- {{ rubric.name }} {{ rubric.get_article_count }}</a></li>
             </ul>
             {% endfor %}
         </div>

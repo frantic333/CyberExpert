@@ -139,10 +139,10 @@ def detail(request, article_id):
 
 def rubric(request):
     rubrics = Rubric.objects.all()
-    rubric_article = {}
-    for rubric in rubrics:
-        rubric_article.update({rubric: Article.objects.filter(rubric=rubric.id).count()})
-    return render(request, context={'rubric_article': rubric_article},
+#    rubric_article = {}
+#    for rubric in rubrics:
+#        rubric_article.update({rubric: Article.objects.filter(rubric=rubric.id).count()})
+    return render(request, context={'rubrics': rubrics},
                   template_name='base.html')
 
 

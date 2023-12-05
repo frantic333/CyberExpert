@@ -34,6 +34,11 @@ class Rubric(models.Model):
         return f'{self.name}'
 
 
+    def get_article_count(self):
+        count = Article.objects.filter(rubric=self).count()
+        return count
+
+
 class Instruments(models.Model):
     file_name = models.CharField(verbose_name='Название файла', max_length=30, unique=True)
     instrument = models.FileField(verbose_name='Инструмент', blank=False, validators=[tool_file_size], upload_to='instruments')
