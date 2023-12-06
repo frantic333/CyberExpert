@@ -32,6 +32,7 @@
                     <div><a href="#">{{ user.last_name }} {{user.first_name }}</a></div>
                     <div class="submenu_profile">
                         <div>
+                            <p><a class="fa fa-heart" href="{% url 'favourites' %}">Список для чтения</a></p>
                             <p class="fa fa-sign-out"><a style="color: rgba(238, 68, 68, 0.83)" href="{% url 'logout' %}">Выход</a></p>
                         </div>
                     </div>
@@ -49,10 +50,7 @@
         <div class="article_title">
             {% for rubric in rubrics %}
             <ul>
-                {{ rubric }}
-                {% for article in rubric.article_set.all %}
-                    {{ article }}
-                {% endfor %}
+                <li><a href="{% url 'rubric_article' rubric.pk %}">- {{ rubric.name }} {{ rubric.get_article_count }}</a></li>
             </ul>
             {% endfor %}
         </div>
