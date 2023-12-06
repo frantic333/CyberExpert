@@ -9,3 +9,12 @@ class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
         fields = ('title', 'rubric', 'date_added', 'content', 'image', )
+
+
+class OrderByForm(forms.Form):
+    PRICE_CHOICES = (
+        ('rating', 'рэйтинг автора'),
+        ('views', 'количество просмотров'),
+        )
+
+    price_order = forms.ChoiceField(label='', choices=PRICE_CHOICES, initial=PRICE_CHOICES[0])

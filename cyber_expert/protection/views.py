@@ -27,22 +27,34 @@ class MainView(ListView, FormView):
     #        request.session['views']  = views
     #        return super(MainView, self).get(request, *args, **kwargs)
 
+    def rating_sort(self, queryset):
+        articles_sorted = sorted(queryset, key=lambda article: article.author.get_average_rating())
+        print(articles_sorted)
+
+    def views_sort(self, queryset):
+        articles_sorted = sorted(queryset, key=lambda article: self.request.session['views'].get(article.id))
+        return articles_sorted
+
+    def default_sort(self, queryset):
+        articles_sorted = sorted(queryset, key=lambda article: article.title)
+        return articles_sorted
+
     def get_queryset(self):
+        queryset = Article.objects.all()
         keys = self.request.GET.keys()
         if 'search' in keys:
             search_word = self.request.GET.get('search')
-            queryset = Article.objects.filter(title__icontains=search_word)
+            queryset = queryset.filter(title__icontains=search_word)
             return queryset
         elif 'price_order' in keys:
-            #if self.request.GET.get == 'rating':
-           #     rating = Rating.objects.filter(author=article.author).aggregate(ave_rating=Avg('rating')
-
-           #     price_order_by =
-            price_order_by =  self.request.GET.get('price_order')
-            queryset = Article.objects.all().order_by(price_order_by)
-            return queryset
+            sort_methods = {'rating': self.rating_sort,
+                            'views': self.views_sort}
+            for key, value in sort_methods.items():
+                if key == self.request.GET.get('price_order'):
+                    value(queryset)
         else:
-            return MainView.queryset
+            return self.default_sort(queryset)
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(MainView, self).get_context_data(**kwargs)
@@ -148,9 +160,9 @@ class ArticleDetailView(DetailView):
         count = views.get(article_id, 0)
         views[article_id] = count + 1
         request.session['views'] = views
-        for view in request.session['views']:
-            print(view)
-        return super(ArticleDetailView, self).get(request, *args, **kwargs)
+        request.session.modified = True
+        print(request.session['views'].get(article_id))
+        return super(ArticleDetailView, self).get(request,*args, **kwargs)
 
     def get_queryset(self):
         return Article.objects.filter(id=self.kwargs.get('article_id'))
@@ -176,9 +188,6 @@ def detail(request, article_id):
 
 def rubric(request):
     rubrics = Rubric.objects.all()
-#    rubric_article = {}
-#    for rubric in rubrics:
-#        rubric_article.update({rubric: Article.objects.filter(rubric=rubric.id).count()})
     return render(request, context={'rubrics': rubrics},
                   template_name='base.html')
 
@@ -237,11 +246,6 @@ class FavouriteView(MainView):
         ids = self.request.session.get('favourites', list())
         return queryset.filter(id__in=ids)
 
-
-class CountViewsView(MainView):
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(object=request.session['views'])
-        return super(CountViewsView, self).get(request, *args, **kwargs)
 
 def add_reading_list(request, article_id):
     if request.method == 'POST':
