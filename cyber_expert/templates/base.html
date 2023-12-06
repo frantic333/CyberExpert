@@ -16,6 +16,11 @@
             <img src="{% static 'logo.png' %}" alt="Лого сайта" title="Лого сайта">
           </a>
             <div class="sections">
+                <form method="get">
+                    {% csrf_token %}
+                    <input type="search" name="search" placeholder="Поиск статьи" maxlength="250" size="32">
+                    <input type="submit" value="Поиск">
+                </form>
                 <div class="article_title"><a href="{% url 'index' %}">Статьи</a></div>
                 <div class="instrument_title"><a href="{% url 'instrument' %}">Инструменты</a></div>
             </div>
@@ -42,10 +47,12 @@
     </header>
     <aside>
         <div class="article_title">
-            <a href="{% url 'rubric' %}">Рубрики</a>
             {% for rubric in rubrics %}
             <ul>
-                <li><a href="{% url 'rubric_article' rubric.pk %}">- {{ rubric.name }} {{ rubric.get_article_count }}</a></li>
+                {{ rubric }}
+                {% for article in rubric.article_set.all %}
+                    {{ article }}
+                {% endfor %}
             </ul>
             {% endfor %}
         </div>
