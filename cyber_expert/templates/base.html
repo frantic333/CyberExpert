@@ -50,7 +50,7 @@
         <div class="article_title">
             {% for rubric in rubrics %}
             <ul>
-                <li><a href="{% url 'rubric_article' rubric.pk %}">- {{ rubric.name }} {{ rubric.get_article_count }}</a></li>
+                <li><a href="{% url 'rubric_article' rubric.pk %}">-{{ rubric }} {{  rubric.article_set.count }}</a></li>
             </ul>
             {% endfor %}
         </div>

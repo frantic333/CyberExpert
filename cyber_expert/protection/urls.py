@@ -15,6 +15,5 @@ urlpatterns = [
     path('rating/<int:author_id>/<int:article_id>', rating, name='rating'),
     path('add_reading_list/<int:article_id>', add_reading_list, name='add_reading_list'),
     path('remove_reading_list/<int:article_id>', remove_reading_list, name='remove_reading_list'),
-    path('favourites/', FavouriteView.as_view(), name='favourites'),
-    path('count_views/', CountViewsView.as_view(), name='count_views')
+    path('favourites/', FavouriteView.as_view(), name='favourites')
 ]

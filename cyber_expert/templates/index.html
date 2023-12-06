@@ -1,13 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load get_views %}
 {% block content %}
+
+    <form id="form" method="get">
+        {{ form }}
+        <button type="submit">Получить</button>
+    </form>
+
     <div class="courses_container">
         {% for article in articles %}
             <div class="course_preview">
                 <p><a href="{% url 'detail' article.pk %}">{{ article.title }}</a></p>
+                {% if not article.pk in request.session.favourites or not request.session.favourites %}
+                    <div class="favourite_container">
+                        <form id="favourite_form" method="post" action="{% url 'add_reading_list' article.pk %}"
+                            title="Принять участие">
+                            {% csrf_token %}
+                            <button type="submit" class="fa fa-plus" style="color: #fa9405"></button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="favourite_container">
+                        <form id="favorite_form" method="post" action="{% url 'remove_reading_list' article.pk %}"
+                            title="Принять участие">
+                            {% csrf_token %}
+                            <button type="submit" class="fa fa-check" style="color: green"></button>
+                        </form>
+                    </div>
+                {% endif %}
                 <p>{{ article.date_added }}</p>
                 <p>Автор: {{ article.author.last_name }}  {{ article.author.first_name }}</p>
-                <p>рэйтинг {{ article.author.get_average_rating }}</p>
+                <p>рэйтинг {{ article.author.get_average_rating|floatformat:2 }}</p>
+                <p>{{ article.id|get_views:request }}</p>
             </div>
         {% endfor %}
     </div>
