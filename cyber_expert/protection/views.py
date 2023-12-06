@@ -3,19 +3,46 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, redirect
 from datetime import datetime
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse
-from .forms import ArticleForm
+from .forms import ArticleForm, OrderByForm
 from .models import *
 from auth_app.models import User
 
 
 
-class MainView(ListView):
+class MainView(ListView, FormView):
     template_name = 'index.html'
     queryset = Article.objects.all()
     context_object_name = 'articles'
     paginate_by = 4
+
+    form_class = OrderByForm
+
+    #def get(self, request, *args, **kwargs):
+    #    for article in queryset:
+    #        views = request.session.setdefault('views', {})
+    #        count = views.get(article, 0)
+    #        views[article] = count + 1
+    #        request.session['views']  = views
+    #        return super(MainView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        keys = self.request.GET.keys()
+        if 'search' in keys:
+            search_word = self.request.GET.get('search')
+            queryset = Article.objects.filter(title__icontains=search_word)
+            return queryset
+        elif 'price_order' in keys:
+            #if self.request.GET.get == 'rating':
+           #     rating = Rating.objects.filter(author=article.author).aggregate(ave_rating=Avg('rating')
+
+           #     price_order_by =
+            price_order_by =  self.request.GET.get('price_order')
+            queryset = Article.objects.all().order_by(price_order_by)
+            return queryset
+        else:
+            return MainView.queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(MainView, self).get_context_data(**kwargs)
@@ -115,6 +142,16 @@ class ArticleDetailView(DetailView):
     context_object_name = 'article'
     pk_url_kwarg = 'article_id'
 
+    def get(self, request, *args, **kwargs):
+        views = request.session.setdefault('views', {})
+        article_id = str(kwargs[ArticleDetailView.pk_url_kwarg])
+        count = views.get(article_id, 0)
+        views[article_id] = count + 1
+        request.session['views'] = views
+        for view in request.session['views']:
+            print(view)
+        return super(ArticleDetailView, self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         return Article.objects.filter(id=self.kwargs.get('article_id'))
 
@@ -192,3 +229,31 @@ def rating(request, user_id, article_id):
     else:
         return render(request, 'rating.html')
 '''
+
+class FavouriteView(MainView):
+
+    def get_queryset(self):
+        queryset = super(FavouriteView, self).get_queryset()
+        ids = self.request.session.get('favourites', list())
+        return queryset.filter(id__in=ids)
+
+
+class CountViewsView(MainView):
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(object=request.session['views'])
+        return super(CountViewsView, self).get(request, *args, **kwargs)
+
+def add_reading_list(request, article_id):
+    if request.method == 'POST':
+        favourites = request.session.get('favourites', list())
+        favourites.append(article_id)
+        request.session['favourites'] = favourites
+        request.session.modified = True
+    return redirect(reverse('index'))
+
+
+def remove_reading_list(request, article_id):
+    if request.method == 'POST':
+        request.session.get('favourites').remove(article_id)
+        request.session.modified = True
+    return redirect(reverse('index'))
