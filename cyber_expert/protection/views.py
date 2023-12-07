@@ -28,38 +28,39 @@ class MainView(ListView, FormView):
     #        return super(MainView, self).get(request, *args, **kwargs)
 
     def rating_sort(self, queryset):
-        articles_sorted = sorted(queryset, key=lambda article: article.author.get_average_rating())
-        print(articles_sorted)
+        sorted_article = sorted(queryset, key=lambda article: article.author.get_average_rating(), reverse=True)
+        return sorted_article
 
     def views_sort(self, queryset):
-        articles_sorted = sorted(queryset, key=lambda article: self.request.session['views'].get(article.id))
-        return articles_sorted
-
-    def default_sort(self, queryset):
-        articles_sorted = sorted(queryset, key=lambda article: article.title)
-        return articles_sorted
+        sorted_article = sorted(queryset,
+                                key=lambda article: self.request.session.get('views').get(str(article.id), 0),
+                                reverse=True)
+        return sorted_article
 
     def get_queryset(self):
-        queryset = Article.objects.all()
+        queryset = MainView.queryset
         keys = self.request.GET.keys()
         if 'search' in keys:
             search_word = self.request.GET.get('search')
             queryset = queryset.filter(title__icontains=search_word)
             return queryset
-        elif 'price_order' in keys:
-            sort_methods = {'rating': self.rating_sort,
-                            'views': self.views_sort}
-            for key, value in sort_methods.items():
-                if key == self.request.GET.get('price_order'):
-                    value(queryset)
+        elif 'sort' in keys:
+            sort_methods = {'rating': self.rating_sort(queryset),
+                            'views': self.views_sort(queryset)}
+            sort_by = self.request.GET.get('sort')
+            if sort_by in sort_methods:
+                sorted_article = sort_methods.get(sort_by)
+                return sorted_article
         else:
-            return self.default_sort(queryset)
+            return queryset
 
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(MainView, self).get_context_data(**kwargs)
         context['current_year'] = datetime.now().year
         return context
+
+
 '''
 def index(request):
     articles = Article.objects.all()
@@ -161,7 +162,6 @@ class ArticleDetailView(DetailView):
         views[article_id] = count + 1
         request.session['views'] = views
         request.session.modified = True
-        print(request.session['views'].get(article_id))
         return super(ArticleDetailView, self).get(request,*args, **kwargs)
 
     def get_queryset(self):

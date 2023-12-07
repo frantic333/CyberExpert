@@ -17,4 +17,4 @@ class OrderByForm(forms.Form):
         ('views', 'количество просмотров'),
         )
 
-    price_order = forms.ChoiceField(label='', choices=PRICE_CHOICES, initial=PRICE_CHOICES[0])
+    price_order = forms.ChoiceField(label='', choices=PRICE_CHOICES)

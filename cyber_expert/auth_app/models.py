@@ -23,4 +23,4 @@ class User(AbstractUser):
 
     def get_average_rating(self):
         rating = Rating.objects.filter(author=self).aggregate(ave_rating=Avg('rating'))
-        return rating.get('ave_rating')
+        return rating.get('ave_rating', 0)

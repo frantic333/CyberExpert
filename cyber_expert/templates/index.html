@@ -3,9 +3,13 @@
 {% load get_views %}
 {% block content %}
 
-    <form id="form" method="get">
-        {{ form }}
-        <button type="submit">Получить</button>
+    <form method="get">
+        {% csrf_token %}
+        <select name="sort" autofocus>
+            <option value="rating">рэйтинг</option>
+            <option value="views">просмотры</option>
+        </select>
+        <input type="submit" value="Получить">
     </form>
 
     <div class="courses_container">
