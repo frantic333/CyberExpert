@@ -20,14 +20,6 @@ class MainView(ListView, FormView):
 
     form_class = OrderByForm
 
-    #def get(self, request, *args, **kwargs):
-    #    for article in queryset:
-    #        views = request.session.setdefault('views', {})
-    #        count = views.get(article, 0)
-    #        views[article] = count + 1
-    #        request.session['views']  = views
-    #        return super(MainView, self).get(request, *args, **kwargs)
-
     def rating_sort(self, queryset):
         sorted_article = sorted(queryset, key=lambda article: article.author.get_average_rating(), reverse=True)
         return sorted_article
@@ -48,6 +40,7 @@ class MainView(ListView, FormView):
         elif 'sort' in keys:
             sort_methods = {'rating': self.rating_sort(queryset),
                             'views': self.views_sort(queryset)}
+
             sort_by = self.request.GET.get('sort')
             if sort_by in sort_methods:
                 sorted_article = sort_methods.get(sort_by)
@@ -62,31 +55,7 @@ class MainView(ListView, FormView):
         return context
 
 
-'''
-def index(request):
-    articles = Article.objects.all()
-#    def get_average_rating(articles):
-#        for article in articles:
-#            rating = Rating.objects.filter(author=article.author).aggregate(ave_rating=Avg('rating'))
-#            return rating.get('ave_rating')
-    #users = User.objects.annotate(ave=Avg('rating__rating'))
-    #for user in users:
-    #    print(user.ave, user)
-    #authors_id = []
-    #for article in articles:
-    #    authors_id.append(article.author_id)
-    #users = User.objects.filter(rating__author_id__in=authors_id).aggregate(ave=Avg('rating__rating'))
-
-    #author_rating = Rating.objects.annotate(ave_rating=Avg('rating'))
-    #rating = User.objects.aggregate(ave_rating=Avg('rating__rating'))
-    current_year = datetime.now().year
-    return render(request, context={'articles': articles,
-                                    'current_year': current_year},
-                  template_name='index.html')
-'''
-
-
-class ArticleCreateView(CreateView):
+class ArticleCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'create.html'
     model = Article
     form_class = ArticleForm
@@ -101,19 +70,6 @@ class ArticleCreateView(CreateView):
         article.author = self.request.user
         article.save()
         return super(ArticleCreateView, self).form_valid(form)
-
-'''
-def create(request):
-    if request.method == 'POST':
-        data = request.POST
-        Article.objects.create(title=data['title'], author=request.user,
-                              rubric=data['rubric'], date_added=data['date_added'],
-                              content=data['content'], image=data['image'])
-        return redirect('index')
-    else:
-        rubrics = Rubric.objects.all()
-        return render(request, context={'rubrics': rubrics}, template_name='create.html')
-'''
 
 
 class ArticleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -143,11 +99,6 @@ class ArticleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
 
     def get_success_url(self):
         return reverse('index')
-'''
-def delete(request, article_id):
-    Article.objects.get(id=article_id).delete()
-    return redirect('index')
-'''
 
 
 class ArticleDetailView(DetailView):
@@ -188,16 +139,7 @@ class ArticleDetailView(DetailView):
         if not is_estimated:
             context['estimate'] = True
         return context
-'''    
-def detail(request, article_id):
-    article = Article.objects.get(id=article_id)
-    comments = Comments.objects.filter(article=article_id)
-    context = {'article': article, 'comments': comments}
-    is_estimated = Rating.objects.filter(author=article.author, estimator=request.user).exists()
-    if not is_estimated:
-        context.update({'estimate': True})
-    return render(request, 'detail.html', context)
-'''
+
 
 def rubric(request):
     rubrics = Rubric.objects.all()
@@ -282,17 +224,6 @@ def rating(request, author_id, article_id):
                               rating=data['rating'])
     return redirect(reverse('detail', kwargs={'article_id': article_id}))
 
-'''
-def rating(request, user_id, article_id):
-    author = User.objects.get(id=user_id)
-    if request.method == 'POST':
-        data = request.POST
-        Rating.objects.create(estimator=request.user, author=author,
-                              rating=data['rating'])
-        return redirect(reverse('detail', kwargs={'article_id': article_id}))
-    else:
-        return render(request, 'rating.html')
-'''
 
 class FavouriteView(MainView):
 
