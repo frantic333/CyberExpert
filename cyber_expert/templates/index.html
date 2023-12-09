@@ -6,8 +6,8 @@
     <form method="get">
         {% csrf_token %}
         <select name="sort" autofocus>
-            <option value="rating">рэйтинг</option>
-            <option value="views">просмотры</option>
+            <option value="rating">по убыванию рэйтинга</option>
+            <option value="views">по убыванию просмотров</option>
         </select>
         <input type="submit" value="Получить">
     </form>

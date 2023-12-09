@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="main_container">
+        <div class="main_item">
+            <h3>Загрузить файл</h3>
+             <form id="form" method="post">
+                <h3>{% block form_name %}загрузить файл{% endblock %}</h3>
+                {% csrf_token %}
+                <p>Название утилиты<input type="text" name="file_name" maxlength="30"></p>
+                <p>Выберите файл<input type="file" name="instrument"></p>
+                <p>Описание<input type="search" name="description" maxlength="1000"></p>
+                <p><button type="submit">загрузить</button></p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

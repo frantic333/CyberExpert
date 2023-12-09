@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CyberExpert - {% block title %}кибербезопасность{% endblock %}</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}/styles.css">
+</head>
+<body>
+    <main>
+        {% block content %}
+          <p>{{ message }}</p><br>
+
+          <div class="course_container">
+            <div class="course_preview" style="transform: none; box-shadow: none; border: none">
+              <p>Вы можете посмотреть ответ автора статьи<a href="{{ request.scheme}}://{{ request.META.HTTP_HOST }}{{ article.get_absolute_url }} ">{{ article.title }}</a></p>
+            </div>
+          </div>
+        {% endblock %}
+    </main>
+</body>
+</html>

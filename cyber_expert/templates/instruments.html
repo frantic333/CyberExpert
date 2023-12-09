@@ -2,12 +2,13 @@
 {% load static %}
 {% block content %}
     <div class="courses_container">
+        <p><a href="{% url 'upload_instrument' %}">Upload</a></p>
         {% for instrument in instruments %}
             <div class="course_preview">
-                <p>{{ instrument.file_name }}</p>
-                <p>{{ instrument.description }}</p>
+                <p>{{ instrument.file_name|title }}</p>
+                <p><a href="{% url 'download_instrument' instrument.pk %}">download</a></p>
+                <p>{{ instrument.description|capfirst }}</p>
                 <p>Пользователь-отправитель: {{ instrument.user_sender.last_name }}  {{ instrument.user_sender.first_name }}</p>
-                <p>{{ instrument.instrument }}</p>
             </div>
         {% endfor %}
     </div>

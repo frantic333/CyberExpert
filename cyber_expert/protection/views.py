@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, redirect
@@ -7,6 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse
 from .forms import ArticleForm, OrderByForm
 from .models import *
+from .signals import comment_answer
 from auth_app.models import User
 
 
@@ -85,13 +86,12 @@ def index(request):
 '''
 
 
-
-class ArticleCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class ArticleCreateView(CreateView):
     template_name = 'create.html'
     model = Article
     form_class = ArticleForm
 
-    permission_required('protection.add_article', )
+    permission_required = ('protection.add_article', )
 
     def get_success_url(self):
         return reverse('detail', kwargs={'article_id': self.object.id})
@@ -122,7 +122,7 @@ class ArticleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
     template_name = 'create.html'
     pk_url_kwarg = 'article_id'
 
-    permission_required('protection.change_article', )
+    permission_required = ('protection.change_article', )
 
     def get_queryset(self):
         return Article.objects.filter(id=self.kwargs.get('article_id'))
@@ -136,7 +136,7 @@ class ArticleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     template_name = 'delete.html'
     pk_url_kwarg = 'article_id'
 
-    permission_required('protection.delete_article', )
+    permission_required = ('protection.delete_article', )
 
     def get_queryset(self):
         return Article.objects.filter(id=self.kwargs.get('article_id'))
@@ -167,10 +167,23 @@ class ArticleDetailView(DetailView):
     def get_queryset(self):
         return Article.objects.filter(id=self.kwargs.get('article_id'))
 
+    def sort_comments(self, parent_comments, comments):
+        sorted_comments = []
+        for parent_comment in parent_comments:
+            parent_comments_list = []
+            parent_comments_list.append(parent_comment)
+            for comment in comments:
+                if comment.parent_comment == parent_comment:
+                    parent_comments_list.append(comment)
+            sorted_comments.append(parent_comments_list)
+        return sorted_comments
+
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
-        context['comments'] = Comments.objects.filter(article=self.kwargs.get('article_id'))
-        #article = Article.objects.filter(id=self.kwargs.get('article_id'))
+        parent_comments = Comments.objects.filter(article=self.kwargs.get('article_id'), parent_comment=None)
+        comments = Comments.objects.filter(article=self.kwargs.get('article_id'))
+        sorted_comments = self.sort_comments(parent_comments, comments)
+        context['sorted_comments'] = sorted_comments
         is_estimated = Rating.objects.filter(author__article=self.kwargs.get('article_id'), estimator=self.request.user).exists()
         if not is_estimated:
             context['estimate'] = True
@@ -199,10 +212,37 @@ def rubric_article(request, rubric_id):
 
 
 @login_required
-@permission_required('protection.add_instruments', raise_exception=True)
 def instrument(request):
     instruments = Instruments.objects.all()
     return render(request, context={'instruments': instruments}, template_name='instruments.html')
+
+
+@login_required
+@permission_required('protection.add_article', raise_exception=True)
+def upload_instrument(request):
+    msg = 'Ваш рэйтинг недостаточен для загрузки полезных утилит'
+    if request.method == 'POST':
+        data = request.POST
+        Instruments.objects.create(file_name=data['file_name'], instrument=data['instrument'],
+                                   description=data['description'], is_confirmed=True, user_sender=request.user)
+        return redirect(reverse('instrument'))
+    else:
+        try:
+            if request.user.get_average_rating() >= 4.95:
+                return render(request, 'upload_instrument.html')
+            else:
+                return HttpResponse(msg)
+        except TypeError:
+            return HttpResponse(msg)
+
+
+@login_required
+def download_instrument(request, instrument_id):
+    file = Instruments.objects.get(id=instrument_id)
+    filename = file.instrument.path
+    response = FileResponse(open(filename, 'rb'))
+    return response
+
 
 
 @login_required
@@ -211,11 +251,26 @@ def comment(request, article_id):
     article = Article.objects.get(id=article_id)
     if request.method == 'POST':
         data = request.POST
-        Comments.objects.create(article=article, author=article.author,
-                              parent_comment=data['parent_comment'], date_sent=data['date_sent'])
+        Comments.objects.create(article=article, author=request.user,
+                              content=data['content'])
         return redirect(reverse('detail', kwargs={'article_id': article_id}))
     else:
         return render(request, 'comment.html')
+
+
+@login_required
+@permission_required(('protection.add_comments', 'protection.add_article', ), raise_exception=True)
+def answer_comment(request, article_id, parent_comment_id):
+    article = Article.objects.get(id=article_id)
+    comment = Comments.objects.get(id=parent_comment_id)
+    if request.method == 'POST':
+        data = request.POST
+        Comments.objects.create(article=article, author=request.user,
+                              content=data['content'], parent_comment=comment)
+        comment_answer.send(sender=Comments, request=request, article_id=article_id, parent_comment_id=parent_comment_id)
+        return redirect(reverse('detail', kwargs={'article_id': article_id}))
+    else:
+        return render(request, 'answer_comment.html')
 
 
 @login_required

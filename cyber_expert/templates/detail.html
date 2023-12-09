@@ -19,15 +19,20 @@
 
         <p style="font-weight: bold; margin-left: 5.5%">
             Комментарии
-            <span style="font-weight: initial; font-size: .85em">{{ comments.count }}</span>
+            <span style="font-weight: initial; font-size: .85em">{{ sorted_comments.count }}</span>
             <a style="font-size: .8em" href="{% url 'comment' article.pk %}">Написать комментарий</a>
         </p>
 
         <div class="reviews_container">
-            {% for comment in comments %}
+            {% for comments in sorted_comments %}
             <div class="review">
-                <p>{{ comment.author.last_name }} {{ comment.author.first_name }} {{ comment.date_sent }}</p>
-                <p>{{ comment.parent_comment }}</p>
+                <p>{{ comments.0.author.last_name }} {{ comments.0.author.first_name }} {{ comments.0.date_sent }} </p>
+                {% if comments.1 == None %}
+                    <p><a style="color:red; font-size: .7em" href="{% url 'answer_comment' article.pk comments.0.pk %}">ответить</a></p>
+                {% else %}
+                    <p>{{ comments.1.author.last_name }} {{ comments.1.author.first_name }} {{ comments.1.date_sent }} </p>
+                    <p>{{ comments.1.content }}</p>
+                {% endif %}
             </div>
             {% empty %}
             <p><a href="{% url 'comment' article.pk %}">Оставьте комментарий.</a> Комментариев пока нет </p>

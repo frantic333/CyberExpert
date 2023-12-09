@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from .function import tool_file_size
+from django.urls import reverse
 
 
 class Article(models.Model):
@@ -16,6 +17,9 @@ class Article(models.Model):
         verbose_name = 'Статья'
         ordering = ['title']
 
+
+    def get_absolute_url(self):
+        return reverse('detail', kwargs={'article_id': self.pk})
 
     def __str__(self):
         return f'{self.title}: Старт{self.date_added}'
@@ -58,9 +62,10 @@ class Instruments(models.Model):
 
 class Comments(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='статья')
+    content = models.TextField(verbose_name='Комментарий', max_length=250)
     parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Родительский комментарий', null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Автор комментария')
-    date_sent = models.DateField(verbose_name='Дата отправки комментария')
+    date_sent = models.DateField(auto_now_add=True, verbose_name='Дата отправки комментария')
 
     class Meta:
         verbose_name_plural = 'Комментарии'

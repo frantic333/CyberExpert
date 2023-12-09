@@ -3,10 +3,10 @@
     <div class="main_container">
         <div class="main_item">
             <form id="form" method="post">
-                <h3>{% block form_name %}Комментарий{% endblock %}</h3>
+                <h3>{% block form_name %}Ответ на комментарий{% endblock %}</h3>
                 {% csrf_token %}
                 <p>
-                    <textarea name="content" placeholder="Комментарий" maxlength="250" required autofocus></textarea>
+                    <textarea name="content" placeholder="Ответ на комментарий" maxlength="250" required autofocus></textarea>
                 </p>
                 <p><button type="submit">Комментировать</button></p>
             </form>
