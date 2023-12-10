@@ -123,17 +123,6 @@ class ArticleDetailView(DetailView):
     def get_queryset(self):
         return Article.objects.filter(id=self.kwargs.get('article_id'))
 
-    def sort_comments(self, parent_comments, comments):
-        sorted_comments = []
-        for parent_comment in parent_comments:
-            parent_comments_list = []
-            parent_comments_list.append(parent_comment)
-            for comment in comments:
-                if comment.parent_comment == parent_comment:
-                    parent_comments_list.append(comment)
-            sorted_comments.append(parent_comments_list)
-        return sorted_comments
-
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
         article = self.object
