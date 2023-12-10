@@ -3,12 +3,13 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, redirect
 from datetime import datetime
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View
 from django.urls import reverse
 from .forms import ArticleForm, OrderByForm
 from .models import *
 from .signals import comment_answer
 from auth_app.models import User
+from django.shortcuts import get_object_or_404
 
 
 
@@ -20,15 +21,18 @@ class MainView(ListView, FormView):
 
     form_class = OrderByForm
 
-    def rating_sort(self, queryset):
-        sorted_article = sorted(queryset, key=lambda article: article.author.get_average_rating(), reverse=True)
+    def rating_sort(self, queryset, reverse=True):
+        sorted_article = sorted(queryset, key=lambda article: article.author.get_average_rating(), reverse=reverse)
         return sorted_article
 
     def views_sort(self, queryset):
-        sorted_article = sorted(queryset,
-                                key=lambda article: self.request.session.get('views').get(str(article.id), 0),
-                                reverse=True)
-        return sorted_article
+        try:
+            sorted_article = sorted(queryset,
+                                    key=lambda article: self.request.session.get('views').get(str(article.id), 0),
+                                    reverse=True)
+            return sorted_article
+        except AttributeError:
+            return queryset
 
     def get_queryset(self):
         queryset = MainView.queryset
@@ -39,6 +43,7 @@ class MainView(ListView, FormView):
             return queryset
         elif 'sort' in keys:
             sort_methods = {'rating': self.rating_sort(queryset),
+                            'rating_reverse': self.rating_sort(queryset, False),
                             'views': self.views_sort(queryset)}
 
             sort_by = self.request.GET.get('sort')
@@ -178,12 +183,13 @@ def upload_instrument(request):
             return HttpResponse(msg)
 
 
-@login_required
-def download_instrument(request, instrument_id):
-    file = Instruments.objects.get(id=instrument_id)
-    filename = file.instrument.path
-    response = FileResponse(open(filename, 'rb'))
-    return response
+class DownloadView(View):
+    def get(self, request,  instrument_id, *args, **kwargs):
+        tool = get_object_or_404(Instruments, id=instrument_id)
+        file_path = tool.instrument.path
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Disposition'] = f'attachment;filename="{tool.file_name}"'
+        return response
 
 
 
