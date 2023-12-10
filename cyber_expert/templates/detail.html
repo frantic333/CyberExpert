@@ -6,7 +6,7 @@
             <p><a style="color:blue" href="{% url 'update' article.pk %}">Редактировать</a></p>
             <p>{{ article.title }}</p>
             <p>Автор: {{article.author.last_name }} {{ article.author.first_name }}</p>
-            {% if not is_estimated %}
+            {% if is_estimated %}
                 <form method="post" action="{% url 'rating' article.author.pk article.pk %}">
                     {% csrf_token %}
                     <input type="number" name="rating" min="1" max="5" step="1">

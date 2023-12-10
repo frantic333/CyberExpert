@@ -121,17 +121,17 @@ class ArticleDetailView(DetailView):
         return super(ArticleDetailView, self).get(request,*args, **kwargs)
 
     def get_queryset(self):
-        return Article.objects.filter(id=self.pk_url_kwarg)
+        return Article.objects.filter(id=self.kwargs.get(self.pk_url_kwarg))
 
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
         paper = self.object
         comments = Comments.objects.filter(article=paper).select_related('author').order_by('parent_comment', 'date_sent')
         context['sorted_comments'] = comments
-        if self.request.user.is_authenticated:
-            context['is_estimated'] = Rating.objects.filter(author__article=paper, estimator=self.request.user).exists()
-        else:
+        if not self.request.user.is_authenticated:
             context['is_estimated'] = False
+        else:
+            context['is_estimated'] = Rating.objects.filter(author__article=paper, estimator=self.request.user).exists()
 
 
 def rubric(request):
