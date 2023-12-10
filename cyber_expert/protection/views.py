@@ -136,13 +136,11 @@ class ArticleDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
-        parent_comments = Comments.objects.filter(article=self.kwargs.get('article_id'), parent_comment=None)
-        comments = Comments.objects.filter(article=self.kwargs.get('article_id'))
-        sorted_comments = self.sort_comments(parent_comments, comments)
-        context['sorted_comments'] = sorted_comments
+        article = self.object
+        comments = Comments.objects.filter(article=article).select_related('author').order_by('parent_comment', 'date_sent')
+        context['sorted_comments'] = comments
         if self.request.user.is_authenticated:
-            context['is_estimated'] = Rating.objects.filter(author__article__id=self.kwargs.get('article_id'),
-                                                            estimator=self.request.user).exists()
+            context['is_estimated'] = Rating.objects.filter(author__article=article, estimator=self.request.user).exists()
         else:
             context['is_estimated'] = False
 
