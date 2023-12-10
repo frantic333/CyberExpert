@@ -125,7 +125,7 @@ class ArticleDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
-        paper = self.get_object()
+        paper = self.object
         comments = Comments.objects.filter(article=paper).select_related('author').order_by('parent_comment', 'date_sent')
         context['sorted_comments'] = comments
         if self.request.user.is_authenticated:
