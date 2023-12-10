@@ -63,7 +63,7 @@ class Instruments(models.Model):
 class Comments(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='статья')
     content = models.TextField(verbose_name='Комментарий', max_length=250)
-    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Родительский комментарий', null=True, blank=True)
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Родительский комментарий', null=True, blank=True, related_name='comment_set')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Автор комментария')
     date_sent = models.DateField(auto_now_add=True, verbose_name='Дата отправки комментария')
 

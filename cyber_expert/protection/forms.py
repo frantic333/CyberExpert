@@ -17,3 +17,6 @@ class OrderByForm(forms.Form):
         )
 
     price_order = forms.ChoiceField(label='', choices=PRICE_CHOICES)
+
+
+

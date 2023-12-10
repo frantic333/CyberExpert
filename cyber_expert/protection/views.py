@@ -140,10 +140,11 @@ class ArticleDetailView(DetailView):
         comments = Comments.objects.filter(article=self.kwargs.get('article_id'))
         sorted_comments = self.sort_comments(parent_comments, comments)
         context['sorted_comments'] = sorted_comments
-        is_estimated = Rating.objects.filter(author__article=self.kwargs.get('article_id'), estimator=self.request.user).exists()
-        if not is_estimated:
-            context['estimate'] = True
-        return context
+        if self.request.user.is_authenticated:
+            context['is_estimated'] = Rating.objects.filter(author__article__id=self.kwargs.get('article_id'),
+                                                            estimator=self.request.user).exists()
+        else:
+            context['is_estimated'] = False
 
 
 def rubric(request):
@@ -169,17 +170,15 @@ def instrument(request):
 def upload_instrument(request):
     msg = 'Ваш рэйтинг недостаточен для загрузки полезных утилит'
     if request.method == 'POST':
+        print(request.FILES)
         data = request.POST
-        Instruments.objects.create(file_name=data['file_name'], instrument=data['instrument'],
+        Instruments.objects.create(file_name=data['file_name'], instrument=request.FILES.get('instrument'),
                                    description=data['description'], is_confirmed=True, user_sender=request.user)
         return redirect(reverse('instrument'))
     else:
-        try:
-            if request.user.get_average_rating() >= 4.95:
-                return render(request, 'upload_instrument.html')
-            else:
-                return HttpResponse(msg)
-        except TypeError:
+        if request.user.get_average_rating() >= 4.95:
+            return render(request, 'upload_instrument.html')
+        else:
             return HttpResponse(msg)
 
 
