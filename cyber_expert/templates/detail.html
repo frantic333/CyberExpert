@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <div class="course_container">
         <div class="course_preview" style="transform: none, box-shadow: none, border: none">
@@ -13,13 +14,15 @@
                     <input type="submit" value="Оценить">
                 </form>
             {% endif %}
-            <p>{{ article.image }}</p>
+            {% if article.image %}
+                <img src="{{ article.image.url }}">
+            {% endif %}
             <p>{{ article.content }}</p>
         </div>
 
         <p style="font-weight: bold; margin-left: 5.5%">
             Комментарии
-            <span style="font-weight: initial; font-size: .85em">{{ sorted_comments.count }}</span>
+            <span style="font-weight: initial; font-size: .85em">{{ comments_parent }}</span>
             <a style="font-size: .8em" href="{% url 'comment' article.pk %}">Написать комментарий</a>
         </p>
 

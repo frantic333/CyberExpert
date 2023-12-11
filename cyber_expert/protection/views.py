@@ -125,6 +125,8 @@ class ArticleDetailView(DetailView):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
         article = self.object
         comments = Comments.objects.filter(article=article).select_related('author').order_by('parent_comment', 'date_sent')
+        parent_comments = Comments.objects.filter(article=article, parent_comment=None).count()
+        context['comments_parent'] = parent_comments
         context['sorted_comments'] = comments
         if self.request.user.is_authenticated:
             is_estimated = Rating.objects.filter(author__article__id=self.kwargs.get('article_id'),
@@ -150,7 +152,6 @@ def rubric_article(request, rubric_id):
                   template_name='rubric_article.html')
 
 
-@login_required
 def instrument(request):
     instruments = Instruments.objects.all()
     return render(request, context={'instruments': instruments}, template_name='instruments.html')

@@ -8,3 +8,4 @@ class ProtectionConfig(AppConfig):
 
     def ready(self):
         from .signals import send_comment_answer_email
+        from .signals import set_views
