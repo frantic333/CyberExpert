@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse
 from .forms import ArticleForm, OrderByForm
 from .models import *
-from .signals import comment_answer
+from .signals import comment_answer, set_views
 from auth_app.models import User
 from django.shortcuts import get_object_or_404
 
@@ -112,12 +112,10 @@ class ArticleDetailView(DetailView):
     pk_url_kwarg = 'article_id'
 
     def get(self, request, *args, **kwargs):
-        views = request.session.setdefault('views', {})
-        article_id = str(kwargs[ArticleDetailView.pk_url_kwarg])
-        count = views.get(article_id, 0)
-        views[article_id] = count + 1
-        request.session['views'] = views
-        request.session.modified = True
+        set_views.send(sender=self.__class__,
+                       session=request.session,
+                       pk_url_kwarg=ArticleDetailView.pk_url_kwarg,
+                       id=kwargs[ArticleDetailView.pk_url_kwarg])
         return super(ArticleDetailView, self).get(request,*args, **kwargs)
 
     def get_queryset(self):
@@ -133,6 +131,8 @@ class ArticleDetailView(DetailView):
                                              estimator=self.request.user).exists()
             if is_estimated:
                 context['estimate'] = False
+            else:
+                context['estimate'] = True
         else:
             context['estimate'] = True
         return context

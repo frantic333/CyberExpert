@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
-
+set_views = Signal()
 comment_answer = Signal()
 
 def send_comment_answer_email(**kwargs):
@@ -22,4 +22,14 @@ def send_comment_answer_email(**kwargs):
               html_message=render_to_string(template_name, context, kwargs['request']),
               fail_silently=False)
 
+def incr_views(sender, **kwargs):
+    session = kwargs['session']
+    views = session.setdefault('views', {})
+    article_id = str(kwargs['id'])
+    count = views.get(article_id, 0)
+    views[article_id] = count + 1
+    session['views'] = views
+    session.modified = True
+
+set_views.connect(incr_views)
 comment_answer.connect(send_comment_answer_email)
