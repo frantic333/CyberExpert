@@ -125,13 +125,17 @@ class ArticleDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
-        paper = self.object
-        comments = Comments.objects.filter(article=paper).select_related('author').order_by('parent_comment', 'date_sent')
+        article = self.object
+        comments = Comments.objects.filter(article=article).select_related('author').order_by('parent_comment', 'date_sent')
         context['sorted_comments'] = comments
-        if not self.request.user.is_authenticated:
-            context['is_estimated'] = False
+        if self.request.user.is_authenticated:
+            is_estimated = Rating.objects.filter(author__article__id=self.kwargs.get('article_id'),
+                                             estimator=self.request.user).exists()
+            if is_estimated:
+                context['estimate'] = False
         else:
-            context['is_estimated'] = Rating.objects.filter(author__article=paper, estimator=self.request.user).exists()
+            context['estimate'] = True
+        return context
 
 
 def rubric(request):
@@ -160,7 +164,7 @@ def upload_instrument(request):
         print(request.FILES)
         data = request.POST
         Instruments.objects.create(file_name=data['file_name'], instrument=request.FILES.get('instrument'),
-                                   description=data['description'], is_confirmed=True, user_sender=request.user)
+                                   description=data['description'], is_confirmed=False, user_sender=request.user)
         return redirect(reverse('instrument'))
     else:
         if request.user.get_average_rating() >= 4.95:
